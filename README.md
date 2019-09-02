@@ -37,5 +37,5 @@ conda install r=3.5.1 bioconductor-splatter bioconductor-zinbwave bioconductor-S
 
 # Running the pipeline
 
-Each srcipt has its own description help instructions.
+Each srcipt has its own help instructions.
 
