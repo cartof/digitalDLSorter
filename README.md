@@ -38,4 +38,12 @@ conda install r=3.5.1 bioconductor-splatter bioconductor-zinbwave bioconductor-S
 # Running the pipeline
 
 Each script has its own help instructions.
+```
+Rscript estimateZinbwaveParams.R --help
+python ~/Documents/GitLabProjects/uploadedDLSorter/digitalDLSorter.py --help
+```
+
+Under the data folder there are counts, cellsMetada and genesMetada files to test the pipeline
+
+
 
