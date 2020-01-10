@@ -28,7 +28,7 @@ Using conda enviroment:
 ```
 conda create -n digitalDLSorter
 conda activate digitalDLSorter
-conda install python=3.6.8 numpy pandas argparse matplotlib keras
+conda install tensorflow=1.5.0 python=3.6 numpy pandas argparse matplotlib keras
 conda install r=3.5.1 bioconductor-splatter bioconductor-zinbwave bioconductor-SingleCellExperiment r-gtools r-dplyr r-ggplot2 r-reshape2  bioconductor-edgeR r-pbapply r-optparse
 ```
 
