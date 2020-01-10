@@ -2,7 +2,7 @@
 A pipeline to generate a Deep Neural Network cell type deconvolution model for bulk RNASeq samples from single cell rna-seq data.
 
 # Installation
-The pipeline runs in R 3.51 and python 3.6.8.
+The pipeline runs in R 3.51 and python 3.6.
 
 Install R with the following packages: 
 - splatter
