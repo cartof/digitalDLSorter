@@ -12,9 +12,9 @@ opls[[1]] <- make_option(c('--setType','-t'), action="store", type="character", 
 opls[[2]] <- make_option(c('--cellsMetadataFile','-m'), action="store", type="character", dest="cellsMetadataFile", default=NULL, help="File containing metadata about cells in rows separated by tabs (.tsv, .tsv.gz, .rds) [default: %default]")
 opls[[3]] <- make_option(c('--cellTypeColumn'), action="store", type="character", dest="cellTypeColumn", default=NULL, help="Name of the column containing the cell classification in the cellsMetadataFile [default: %default]")
 opls[[4]] <- make_option(c('--cellIDColumn'), action="store", type="character", dest="cellIDColumn", default=NULL, help="Name of the column containing the cell ID in the cellsMetadataFile, cell IDs should be the same as column names in counts file [default: %default]")
-opls[[5]] <- make_option(c('--cellCovColumns'), action="store", type="character", dest="cellCovColumns", default=NULL, help="List separated by commas of column names from cellsMetadataFile to consider as covariates for the model [default: %default]")
+opls[[5]] <- make_option(c('--cellCovColumns'), action="store", type="character", dest="cellCovColumns", default=c(), help="List separated by commas of column names from cellsMetadataFile to consider as covariates for the model [default: %default]")
 opls[[6]] <- make_option(c('--genesAnnotFile','-g'), action="store", type="character", dest="genesAnnotFile", default=NULL, help="File containing metadata about genes in rows separated by tabs (.tsv, .tsv.gz, .rds) [default: %default]")
-opls[[7]] <- make_option(c('--geneIDColumn'), action="store", type="character", dest="geneIDColumn", default=NULL, help="Name of the column containing the gene ID in the genesAnnotFile, gene IDs should be the same as row names in counts file [default: %default]")
+opls[[7]] <- make_option(c('--geneIDColumn'), action="store", type="character", dest="geneIDColumn", default=c(), help="Name of the column containing the gene ID in the genesAnnotFile, gene IDs should be the same as row names in counts file [default: %default]")
 opls[[8]] <- make_option(c('--geneCovColumns'), action="store", type="character", dest="geneCovColumns", default=NULL, help="List separated by commas of column names from genesAnnotFile to consider as covariates for the model [default: %default]")
 opls[[9]] <- make_option(c('--countsFile','-c'), action="store", type="character", dest="countsFile", default=NULL, help="File containing counts per gene in rows and cells in columns (.tsv, .tsv.gz, .mtx, .rds) [default: %default]")
 opls[[10]] <- make_option(c('--minCounts'), action="store", type="numeric", dest="minCounts", default=0, help="Minimum gene counts to filter [default: %default]")
@@ -65,8 +65,17 @@ outputPath <- args$outputPath
 prefix <- args$prefix
 np <- args$np
 
-cellCovColumns <- strsplit(x = cellCovColumns,split = ",")
-geneCovColumns <- strsplit(x = geneCovColumns,split = ",")
+head(cellCovColumns)
+if(!is.null(cellCovColumns)) {
+	cellCovColumns <- unlist(strsplit(x = cellCovColumns,split = ","))
+	cat(paste(cellCovColumns),"\n")
+}
+
+head(geneCovColumns)
+if(!is.null(geneCovColumns)) {
+	geneCovColumns <- unlist(strsplit(x = geneCovColumns,split = ","))
+	cat(paste(geneCovColumns),"\n")
+}
 
 cat(paste("Parallel",np,"setType",st),"\n")
 
@@ -75,6 +84,7 @@ if (grepl(".tsv",cellsMetadataFile)) {
   if (grepl(".tsv.gz",cellsMetadataFile)) {
     cat("\tTab Gzipped format\n")
     cellsMetadata <- read.delim(file = gzfile(cellsMetadataFile),sep = "\t",header = T,stringsAsFactors = F)
+    head(cellsMetadata)
   } else {
     cat("\tTab plain format\n")
     cellsMetadata <- read.delim(file = cellsMetadataFile,sep = "\t",header = T,stringsAsFactors = F)
@@ -149,12 +159,12 @@ if (grepl(".tsv",countsFile)) {
   cellNames <- read.delim(file.path(baseDir,"barcodes.tsv"),header = F,sep = "\t",stringsAsFactors = F)
   colnames(counts) <- cellNames$V1
 }
-cat(paste("Loaded Counts Matrix from",countsFilem,"\n"))
+cat(paste("Loaded Counts Matrix from",countsFile,"\n"))
 cat(paste0(paste(c("Genes","Cells"),dim(counts))),"\n")
 head(counts)[,1:6]
 cat("\n")
 
-commonGenes <- intersect(rownames(counts),geneAnnot[,geneIDColumn])
+commonGenes <- intersect(rownames(counts),genesAnnot[,geneIDColumn])
 
 if (length(commonGenes) < min(dim(counts)[1],dim(genesAnnot)[1])) {stop(paste("Some genes from",genesAnnotFile,"and",countsFile,"do not match"))}
 
@@ -173,15 +183,14 @@ cat(paste("Counts Matrix after selecting for cells in",cellsMetadataFile,"\n"))
 cat(paste(c("Genes","Cells"),dim(counts)),"\n")
 cat("\n")
 
-minCounts <- 0
-minCells <- 1
 
 dir.create(file.path(outputPath))
 
-if (file.exists(file = file.path(outputPath,paste(prefix,"genesSelected","txt","gz",sep=".")))) {
+if (file.exists(file = file.path(outputPath,paste(prefix,"genesSelected","txt",sep=".")))) {
   
-  cat(paste("Load list of selected genes:from",paste(prefix,"genesSelected","txt","gz",sep="."),"\n"))
-  genesSelected <- read.delim(file = file.path(outputPath,paste(prefix,"genesSelected","txt","gz",sep=".")),sep = "\t",header = F)
+  cat(paste("Load list of selected genes:from",paste(prefix,"genesSelected","txt",sep="."),"\n"))
+  genesSelected <- read.delim(file = file.path(outputPath,paste(prefix,"genesSelected","txt",sep=".")),sep = "\t",header = F,stringsAsFactors = F)
+  genesSelected <- genesSelected[,1]  
   cat(paste("Genes:",length(genesSelected),"\n"))
   head(genesSelected)
   cat("\n")
@@ -196,9 +205,8 @@ if (file.exists(file = file.path(outputPath,paste(prefix,"genesSelected","txt","
   genesSelected <- rownames(counts)
   genesSelected <- genesSelected[!genesSelected == "NA"]
   cat("Genes Selected: ",length(genesSelected),"\n")
-  
-  write.table(genesSelected,file = file.path(outputPath,paste(prefix,"genesSelected","txt","gz",sep=".")),sep = "\t",quote = "F",row.names = F,col.names = F)  
-  cat("Saved to: ",file.path(outputPath,paste(prefix,"genesSelected","txt","gz",sep=".")),"\n")
+  write.table(genesSelected,file = file.path(outputPath,paste(prefix,"genesSelected","txt",sep=".")),sep = "\t",quote = F,row.names = F,col.names = F)  
+  cat("Saved to: ",file.path(outputPath,paste(prefix,"genesSelected","txt",sep=".")),"\n")
   cat("\n")
   
 }
@@ -224,17 +232,18 @@ if (st == "All") {
   counts <- counts[rowSums(counts) > 0,]
   cat(paste(dim(counts)),"\n")
   cat("\n")
-  
+	  
   cat("Estimate parameters for experiment with model matrix\n")
-  cat(paste("Create model matrix based on:",cellCovColumns,"and",cellTypeColumn,"\n"))
-  sdm <- model.matrix(as.formula(paste("~",paste(cellCovColumns,cellTypeColumn,sep="+"))), data = cellsMetadata[match(colnames(counts),cellsMetadata[,cellIDColumn]),])
+  cat(paste("Create model matrix based on:",paste(cellCovColumns,collapse=" "),"and",cellTypeColumn),"\n")
+  print(as.formula(paste("~",paste(c(cellCovColumns,cellTypeColumn),collapse="+"))))
+  sdm <- model.matrix(as.formula(paste("~",paste(c(cellCovColumns,cellTypeColumn),collapse="+"))), data = cellsMetadata[match(colnames(counts),cellsMetadata[,cellIDColumn]),])
   cat(paste(dim(sdm)),"\n")
   print(head(sdm))
   cat("\n")
   
-  if (length(geneCovColumns)) {
+  if (!is.null(geneCovColumns)) {
     cat(paste("Create gene model matrix with",geneCovColumns,"Covariates\n"))
-    gdm <- model.matrix(as.formula(paste("~",paste(geneCovColumns,sep="+"))), data = genesAnnot[match(rownames(counts),genesAnnot[,geneIDColumn]),])
+    gdm <- model.matrix(as.formula(paste("~",paste(geneCovColumns,collapse="+"))), data = genesAnnot[match(rownames(counts),genesAnnot[,geneIDColumn]),])
   } else {
     cat(paste("Create gene model matrix without Covariates\n"))
     gdm <- model.matrix(~1, data = genesAnnot[match(rownames(counts),genesAnnot[,geneIDColumn]),])  

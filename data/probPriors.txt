@@ -1,0 +1,11 @@
+cellType	from	to
+CRC	30	70
+CD4	0	15
+CD8Gn	0	15
+CD8Gp	0	15
+Ep	1	50
+Fb	0	15
+gB	0	20
+pB	0	20
+M	0	20
+Mc	0	20

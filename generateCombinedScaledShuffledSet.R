@@ -147,7 +147,7 @@ sampleNames <- colnames(Counts)
 probsMatrix <- probsMatrix[s,]
 
 Counts <- t(Counts)
-dim(Counts)
+paste(c("Genes:","Samples:"),dim(Counts))
 
 saveRDS(Counts, file = file.path(outputPath,paste(prefix,"combinedCounts","log2CPMScaledShuffledTransposed","rds",sep = ".")))
 gz <- gzfile(file.path(outputPath,paste(prefix,"combinedCounts","log2CPMScaledShuffledTransposed","tsv","gz",sep = ".")),"w")

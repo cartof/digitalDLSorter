@@ -16,7 +16,7 @@ opls[[5]] <- make_option(c('--outputPath','-o'), action="store", type="character
 opls[[6]] <- make_option(c('--design','-d'), action="store", type="character", dest="probsDesignFile", default=NULL, help="File containing probability range for each cell type (column headers: cellType, from, to) [default: %default]")
 opls[[7]] <- make_option(c('--prefix','-p'), action="store", type="character", dest="prefix", help="Prefix for the output file [default: %default]")
 opls[[8]] <- make_option(c('--cellTypeColumn','-q'), action="store", type="character", dest="cellTypeColumn", default=NULL, help="Name of the column containing the cell classification in the cellsMetadataFile [default: %default]")
-opls[[9]] <- make_option(c('--simCells','-n'), action="store", type="numeric", dest="sCells", default=NULL, help="Number of simulated cells [default: %default]")
+#opls[[9]] <- make_option(c('--simCells','-n'), action="store", type="numeric", dest="sCells", default=NULL, help="Number of simulated cells [default: %default]")
 
 opts <- OptionParser(usage = "usage: %prog [options]",
                      option_list = opls, add_help_option = TRUE,
@@ -62,7 +62,7 @@ simCountsFile <- args$simCountsFile
 outputPath <- args$outputPath
 probsDesignFile <- args$probsDesignFile
 prefix <- args$prefix
-sCells <- args$sCells
+#sCells <- args$sCells
 
 dir.create(outputPath)
 dir.create(file.path(outputPath,"Plots"),showWarnings = F)
@@ -137,6 +137,8 @@ if (grepl(".tsv",simCountsFile)) {
 cat(paste0(paste(c("Genes","Cells"),dim(simCounts))),"\n")
 head(simCounts)[,1:6]
 cat("\n")
+
+sCells <- dim(simCounts)[2]
 
 # Split data into training and test sets
 trainSet <- sample(colnames(simCounts),size = round(dim(simCounts)[2]*trainFreq))
@@ -765,12 +767,12 @@ cat("WRITE OUTPUTS\n")
 
 saveRDS(trainProbsMatrix,file = file.path(outputPath,paste(prefix,"trainProbsMatrix","rds",sep=".")))
 saveRDS(trainProbMatrixNames,file = file.path(outputPath,paste(prefix,"trainProbMatrixNames","rds",sep=".")))
-# saveRDS(trainSetList,file = file.path(outputPath,paste(prefix,"trainSetList","rds",sep=".")))
-# saveRDS(trainSet,file = file.path(outputPath,paste(prefix,"trainSet","rds",sep=".")))
+saveRDS(trainSetList,file = file.path(outputPath,paste(prefix,"trainSetList","rds",sep=".")))
+saveRDS(trainSet,file = file.path(outputPath,paste(prefix,"trainSet","rds",sep=".")))
 
 saveRDS(testProbsMatrix,file = file.path(outputPath,paste(prefix,"testProbsMatrix","rds",sep=".")))
 saveRDS(testProbMatrixNames,file = file.path(outputPath,paste(prefix,"testProbMatrixNames","rds",sep=".")))
-# saveRDS(testSetList,file = file.path(outputPath,paste(prefix,"testSetList","rds",sep=".")))
-# saveRDS(testSet,file = file.path(outputPath,paste(prefix,"testSet","rds",sep=".")))
+saveRDS(testSetList,file = file.path(outputPath,paste(prefix,"testSetList","rds",sep=".")))
+saveRDS(testSet,file = file.path(outputPath,paste(prefix,"testSet","rds",sep=".")))
 
 cat("DONE\n")

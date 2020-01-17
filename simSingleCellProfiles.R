@@ -192,16 +192,17 @@ write.table(simCellsMetadata,file = gz1, sep = "\t",row.names = F,col.names = T,
 close(gz1)
 
 ### Write SimData in SparseMatrix together with the original real cells
-cat(paste("Save Matrix Market Counts in",file.path(outputPath,paste(prefix,"aggCountsMtx",nCells,sep = "."))),"\n")
+cat(paste("Save Matrix Market Counts in",file.path(outputPath,paste(prefix,setType,"simCellsCountsMtx",nCells,sep = "."))),"\n")
 simCounts <- Matrix(as.matrix(simCounts),sparse = T)
+origCounts <- Matrix(as.matrix(origCounts),sparse = T)
 simCounts <- cbind(origCounts[rownames(simCounts),],simCounts)
 
-dir.create(file.path(outputPath,paste(prefix,"aggCountsMtx",nCells,sep = ".")))
+dir.create(file.path(outputPath,paste(prefix,setType,"simCellsCountsMtx",nCells,sep = ".")))
 writeMM(simCounts
-        ,file = file.path(outputPath,paste(prefix,"aggCountsMtx",nCells,sep = "."),"matrix.mtx"))
+        ,file = file.path(outputPath,paste(prefix,setType,"simCellsCountsMtx",nCells,sep = "."),"matrix.mtx"))
 
-write.table(x = rownames(simCounts),file = file.path(outputPath,paste(prefix,"aggCountsMtx",nCells,sep = "."),"genes.tsv"),sep="\t",quote = F,col.names = F, row.names = F)
+write.table(x = rownames(simCounts),file = file.path(outputPath,paste(prefix,setType,"simCellsCountsMtx",nCells,sep = "."),"genes.tsv"),sep="\t",quote = F,col.names = F, row.names = F)
 
-write.table(x = colnames(simCounts),file = file.path(outputPath,paste(prefix,"aggCountsMtx",nCells,sep = "."),"barcodes.tsv"),sep="\t",quote = F,col.names = F, row.names = F)
+write.table(x = colnames(simCounts),file = file.path(outputPath,paste(prefix,setType,"simCellsCountsMtx",nCells,sep = "."),"barcodes.tsv"),sep="\t",quote = F,col.names = F, row.names = F)
 
 cat("DONE\n")
