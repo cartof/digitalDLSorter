@@ -2,7 +2,7 @@
 A pipeline to generate a Deep Neural Network cell type deconvolution model for bulk RNASeq samples from single cell rna-seq data.
 
 # Installation
-The pipeline runs in R 3.51 and python 3.6.8.
+The pipeline runs in R 3.5.1 and python 3.6.
 
 Install R with the following packages: 
 - splatter
@@ -28,7 +28,7 @@ Using conda enviroment:
 ```
 conda create -n digitalDLSorter
 conda activate digitalDLSorter
-conda install python=3.6.8 numpy pandas argparse matplotlib keras
+conda install tensorflow=1.5.0 python=3.6 numpy pandas argparse matplotlib keras
 conda install r=3.5.1 bioconductor-splatter bioconductor-zinbwave bioconductor-SingleCellExperiment r-gtools r-dplyr r-ggplot2 r-reshape2  bioconductor-edgeR r-pbapply r-optparse
 ```
 
