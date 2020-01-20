@@ -262,6 +262,6 @@ python digitalDLSorterModelDeconv.py \
 --modelGenesList digitalDLSorterDemo/Demo.digitalDLSorterTrainedModel.inputGeneList.kullback_leibler_divergence.txt.gz \
 --modelClassNames digitalDLSorterDemo/Demo.digitalDLSorterTrainedModel.targetClassNames.kullback_leibler_divergence.txt.gz \
 --countsFile data/TCGA.Colon.Counts.transpose.tsv.gz \
---batch_size 100 --num_samples 521 --normData \
+--batch_size 100 --num_samples 521 --normData True\
 --outputPath digitalDLSorterDemo --prefix Demo.PredictTCGA
 ```
