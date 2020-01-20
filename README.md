@@ -116,12 +116,12 @@ Rscript estimateZinbwaveParams.R \
 -c data/countsMatrix.tsv.gz --minCounts=1 --minCells=1 \
 -o digitalDLSorterDemo -p Demo -d 4
 ```
-Be patient this may take a few hours to run. It is not very optimized. `-d 4` will use 4 threads for some steps of the estimation. Adjust it depending on your resources
-Results will be stored at `digitalDLSorterDemo/` folder
+Be patient this may take a few hours to run. It is not very optimized. `-d 4` will use 4 threads for some steps of the estimation. Adjust it depending on your resources.
+Results will be stored at `digitalDLSorterDemo/` folder.
 
 ### Simulating Single Cells
 
-Using the `Demo.All.zinbParams.rds` file with the estimated parameters we will generate new single cell profiles.
+Using the `Demo.All.zinbParams.rds` r object file with the estimated parameters we will generate new single cell profiles.
 
 We will simulate 100 cell profiles per cell type `-t All -n 100`. In our dataset we have 10 cells types so we will end up with 1000 simulated single cell profiles.
 
@@ -134,7 +134,7 @@ Rscript simSingleCellProfiles.R \
 -m data/countsMatrix.tsv.gz \
 -o digitalDLSorterDemo -p Demo
 ```
- The script generates a counts matrix stored as a sparse matrix in this folder `Demo.All.simCellsCountsMtx.1000` and a metadata file for the simulated cells in two formats, a gzip tsv file `Demo.All.simCellsMetadata.1000.tsv.gz` and an R object `Demo.All.simCellsMetadata.1000.rds`. This files contains both , the original single cell profiles and the simulated ones. 
+ The script generates a counts matrix stored as a sparse matrix in this folder `digitalDLSorterDemo/Demo.All.simCellsCountsMtx.1000` and a metadata file for the simulated cells in two formats, a gzip tsv file `Demo.All.simCellsMetadata.1000.tsv.gz` and an R object `Demo.All.simCellsMetadata.1000.rds`. This files contains both , the original single cell profiles and the simulated ones. 
 
 ## Simulate Bulk profiles
 
@@ -157,11 +157,11 @@ Rscript generateTrainAndTestBulkProbMatrix.R \
 
 This script will generate several files separated in Train and Test sets.
 
-`trainProbsMatrix` and `testProbMatrix` with the list of vectors with cell type fractions to simulate. Cell types in columns and simulated sample in rows.
+`Demo.trainProbsMatrix` and `Demo.testProbMatrix` with the list of vectors with cell type fractions to simulate. Cell types in columns and simulated sample in rows.
 
-`trainProbMatrixNames` and `testProbMatrixNames` with the names of the cells that have been sampled from the training and test pools repectively to build the bulk samples. Each sample in rows made of a 100 cells.
+`Demo.trainProbMatrixNames` and `Demo.testProbMatrixNames` with the names of the cells that have been sampled from the training and test pools repectively to build the bulk samples. Each sample in rows made of a 100 cells.
 
-`trainSetList` and `testSetList` files containing the list of cell types with the pool of cells belonging to each cell type
+`Demo.trainSetList` and `Demo.testSetList` files containing the list of cell types with the pool of cells belonging to each cell type
 
 ### Generate Train and Test Bulk Samples
 
@@ -170,7 +170,6 @@ Using the vectors of cell type fractions created for Train and Test and the Sing
 We will run this step twice, one for the training set and one for the test set.
 
 Training Set
-
 ```bash
 conda activate digitalDLSorter
 Rscript generateBulkSamples.R \
@@ -180,7 +179,6 @@ Rscript generateBulkSamples.R \
 ```
 
 Test set
-
 ```bash
 conda activate digitalDLSorter
 Rscript generateBulkSamples.R \
@@ -189,27 +187,17 @@ Rscript generateBulkSamples.R \
 -o digitalDLSorterDemo -p Demo.Test -n 6
 ```
 
-This step will generate the `Train.simBulkCounts and `Test.simBulkCounts` matrix counts in tsv.gz and r .rds object. With genes in rows and samples in columns.
+This step will generate the `Demo.Train.simBulkCounts and `Demo.Test.simBulkCounts` matrix counts in tsv.gz and r .rds object. With genes in rows and samples in columns.
 
 ## Prepare Single Cell And Bulk profiles for training
 
 Now we will prepare the data to feed the digitalDLSorter model by combining the simulated bulk and single cell profiles, normalize, shuffle and scale them.
 
-We will need the `trainProbsMatrix` or `testProbsMatrix` file with the vectors cell type fractions, the `trainSetList` or `testSetList` file with the list of cells selected for each set and the counts matrix for the single cell profiles `simCellsCountsMtx` and the bulk profiles `simBulkCounts`.
+We will need the `Demo.trainProbsMatrix` or `Demo.testProbsMatrix` file with the vectors cell type fractions, the `Demo.trainSetList` or `Demo.testSetList` file with the list of cells selected for each set and the counts matrix for the single cell profiles `Demo.All.simCellsCountsMtx.1000/matrix.mtx` and the bulk profiles `Demo.Train.simBulkCounts` or `Demo.Test.simBulkCounts`.
 
 Again, we will run this step twice, one for the training set and one for the test set.
 
 Training Set
-
-```bash
-conda activate digitalDLSorter
-Rscript generateCombinedScaledShuffledSet.R \
--m digitalDLSorterDemo/Demo.testProbsMatrix.rds -c digitalDLSorterDemo/Demo.testSetList.rds \
--s digitalDLSorterDemo/Demo.All.simCellsCountsMtx.1000/matrix.mtx -b digitalDLSorterDemo/Demo.Test.simBulkCounts.rds \
--o digitalDLSorterDemo -p Demo.Test
-```
-
-Test Set
 ```bash
 conda activate digitalDLSorter
 Rscript generateCombinedScaledShuffledSet.R \
@@ -218,16 +206,34 @@ Rscript generateCombinedScaledShuffledSet.R \
 -o digitalDLSorterDemo -p Demo.Train
 ```
 
+Test Set
+```bash
+conda activate digitalDLSorter
+Rscript generateCombinedScaledShuffledSet.R \
+-m digitalDLSorterDemo/Demo.testProbsMatrix.rds -c digitalDLSorterDemo/Demo.testSetList.rds \
+-s digitalDLSorterDemo/Demo.All.simCellsCountsMtx.1000/matrix.mtx -b digitalDLSorterDemo/Demo.Test.simBulkCounts.rds \
+-o digitalDLSorterDemo -p Demo.Test
+```
+
 This step will generate two versions of the data, one with all combined single cell and bulk samples and counts without further transformation (`combinedCounts` and  `combinedProbsMatrix`) and one with the samples normalized, scaled and shuffled (`combinedCounts.log2CPMScaledShuffledTransposed` and `combinedProbsMatrix.log2CPMScaledShuffledTransposed`). It also provides the list of genes used `combinedCounts.geneList`.
 
 
 ## Train digitalDLSorter model
 
-With the `log2CPMScaledShuffledTransposed` (samples in rows and genes in columns) files of data we will train the model.
+With the `log2CPMScaledShuffledTransposed` files of data (samples in rows and genes in columns) we will train the model.
 
-We need to provide the number of training `--num_train_samples 16056` and test samples `--num_test_samples 10800`, the final number of genes used after filtering steps `--num_genes 36477`.
+We need to provide the number of training `--num_train_samples 16056` and test samples `--num_test_samples 10800` and the final number of genes used after filtering steps `--num_genes 36477`.
 
-The number of cell types `--num_classes 10`,  batch size to process the data in chunks `--batch_size 100 ` and number of rounds for training `--num_epochs 10`.
+You could use this bash lines to find out the numbers
+```bash
+zcat digitalDLSorterDemo/Demo.Train.combinedCounts.log2CPMScaledShuffledTransposed.tsv.gz | wc -l | awk '{print $0-1}'
+
+zcat digitalDLSorterDemo/Demo.Test.combinedCounts.log2CPMScaledShuffledTransposed.tsv.gz | wc -l | awk '{print $0-1}'
+
+zcat digitalDLSorterDemo/Demo.Train.combinedCounts.geneList.tsv.gz | wc -l
+```
+
+The number of cell types `--num_classes 10`,  batch size to process the data in chunks `--batch_size 100 ` and number of rounds for training `--num_epochs 20`.
 
 Finaly we provide the loss function to reduce `--loss kullback_leibler_divergence` for this demo.
 
@@ -243,7 +249,7 @@ python digitalDLSorter.py \
 --outputPath digitalDLSorterDemo --prefix Demo
 ```
 
-The training step will generate an h5 file with the model `digitalDLSorterTrainedModel.kullback_leibler_divergence.h5` and its weights `digitalDLSorterTrainedWeightsModel.kullback_leibler_divergence`, the list of genes for the input `digitalDLSorterTrainedModel.inputGeneList`, the target class names or cell types `digitalDLSorterTrainedModel.targetClassNames`, the model performance evaluation `digitalDLSorterTrainedModel.evalStats` and the predictions on the test set `digitalDLSorterTrainedModel.DeconvTestPredictions`.
+The training step will generate an h5 file with the model `Demo.digitalDLSorterTrainedModel.kullback_leibler_divergence.h5` and its weights `Demo.digitalDLSorterTrainedWeightsModel.kullback_leibler_divergence`, the list of genes for the input `Demo.digitalDLSorterTrainedModel.inputGeneList`, the target class names or cell types `Demo.digitalDLSorterTrainedModel.targetClassNames`, the model performance evaluation `Demo.digitalDLSorterTrainedModel.evalStats` and the predictions on the test set `Demo.digitalDLSorterTrainedModel.DeconvTestPredictions`.
 
 ## Predict samples with the model
 
@@ -256,6 +262,6 @@ python digitalDLSorterModelDeconv.py \
 --modelGenesList digitalDLSorterDemo/Demo.digitalDLSorterTrainedModel.inputGeneList.kullback_leibler_divergence.txt.gz \
 --modelClassNames digitalDLSorterDemo/Demo.digitalDLSorterTrainedModel.targetClassNames.kullback_leibler_divergence.txt.gz \
 --countsFile data/TCGA.Colon.Counts.transpose.tsv.gz \
---batch_size 100 --num_samples 521 --normData\
+--batch_size 100 --num_samples 521 --normData \
 --outputPath digitalDLSorterDemo --prefix Demo.PredictTCGA
 ```
