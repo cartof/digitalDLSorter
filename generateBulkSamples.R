@@ -118,13 +118,13 @@ colnames(bulkCounts) <- paste("Bulk",seq(dim(bulkCounts)[2]),sep = "_")
 cat("WRITE BULK COUNTS\n")
 saveRDS(bulkCounts,file = file.path(outputPath,paste(prefix,"simBulkCounts","rds",sep=".")))
 gz <- gzfile(file.path(outputPath,paste(prefix,"simBulkCounts","tsv","gz",sep=".")),"w")
-write.table(bulkCounts
-            , file = gz
-            , sep = "\t"
-            , quote = F
-            , row.names = T
-            , col.names = T
-            )
+write.table(bulkCounts,
+            file = gz,
+            sep = "\t",
+            quote = F,
+            row.names = T,
+            col.names = T)
+
 close(gz)
 cat("DONE\n")
 cat("\n")
