@@ -46,8 +46,6 @@ outputPath <- args$outputPath
 prefix <- args$prefix
 nCores <- args$nCores
 
-setwd(outputPath)
-
 cat("Load simCounts File\n")
 if (grepl(".tsv",simCountsFile)) {
   if (grepl(".tsv.gz",simCountsFile)) {
@@ -124,7 +122,6 @@ write.table(bulkCounts,
             quote = F,
             row.names = T,
             col.names = T)
-
 close(gz)
 cat("DONE\n")
 cat("\n")

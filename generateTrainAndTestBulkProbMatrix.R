@@ -66,7 +66,6 @@ prefix <- args$prefix
 
 dir.create(outputPath)
 dir.create(file.path(outputPath,"Plots"),showWarnings = F)
-setwd(outputPath)
 
 cat("Load Cells Metadata\n")
 if (grepl(".tsv",cellsMetadataFile)) {
