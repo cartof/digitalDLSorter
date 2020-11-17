@@ -243,10 +243,10 @@ if (st == "All") {
   
   if (!is.null(geneCovColumns)) {
     cat(paste("Create gene model matrix with",geneCovColumns,"Covariates\n"))
-    gdm <- model.matrix(as.formula(paste("~",paste(geneCovColumns,collapse="+"))), data = genesAnnot[match(rownames(counts),genesAnnot[,geneIDColumn]),])
+    gdm <- model.matrix(as.formula(paste("~",paste(geneCovColumns,collapse="+"))), data = genesAnnot[match(rownames(counts),genesAnnot[,geneIDColumn]),,drop=FALSE])
   } else {
     cat(paste("Create gene model matrix without Covariates\n"))
-    gdm <- model.matrix(~1, data = genesAnnot[match(rownames(counts),genesAnnot[,geneIDColumn]),])  
+    gdm <- model.matrix(~1, data = genesAnnot[match(rownames(counts),genesAnnot[,geneIDColumn]),,drop=FALSE])  
   }
   
   rownames(gdm) <- rownames(counts)
